@@ -198,22 +198,22 @@ if ($forgetpasslink || $helpcenterlink)
 	echo '<br>';
 	echo '<div class="center" style="margin-top: 8px;">';
 	if ($forgetpasslink) {
-		echo '<a class="alogin" href="'.DOL_URL_ROOT.'/user/passwordforgotten.php'.$moreparam.'">(';
+		echo '<a class="alogin" href="'.DOL_URL_ROOT.'/user/passwordforgotten.php'.$moreparam.'">';
 		echo $langs->trans('PasswordForgotten');
-		if (! $helpcenterlink) echo ')';
+		if (! $helpcenterlink) echo '';
 		echo '</a>';
 	}
 
-	if ($forgetpasslink && $helpcenterlink) echo '&nbsp;-&nbsp;';
+	if ($forgetpasslink && $helpcenterlink) echo '&nbsp;&nbsp;';
 
-	if ($helpcenterlink) {
-		$url=DOL_URL_ROOT.'/support/index.php'.$moreparam;
-		if (! empty($conf->global->MAIN_HELPCENTER_LINKTOUSE)) $url=$conf->global->MAIN_HELPCENTER_LINKTOUSE;
-		echo '<a class="alogin" href="'.dol_escape_htmltag($url).'" target="_blank">';
-		if (! $forgetpasslink) echo '(';
-		echo $langs->trans('NeedHelpCenter');
-		echo ')</a>';
-	}
+	// if ($helpcenterlink) {
+	// 	$url=DOL_URL_ROOT.'/support/index.php'.$moreparam;
+	// 	if (! empty($conf->global->MAIN_HELPCENTER_LINKTOUSE)) $url=$conf->global->MAIN_HELPCENTER_LINKTOUSE;
+	// 	echo '<a class="alogin" href="'.dol_escape_htmltag($url).'" target="_blank">';
+	// 	if (! $forgetpasslink) echo '(';
+	// 	echo $langs->trans('NeedHelpCenter');
+	// 	echo ')</a>';
+	// }
 	echo '</div>';
 }
 
