@@ -111,14 +111,14 @@ class pdf_muscadet extends ModelePDFSuppliersOrders
 
 		if ($conf->global->PRODUCT_USE_UNITS)
 		{
-			$this->posxtva=95;
+			$this->posxtva=250;
 			$this->posxup=114;
-			$this->posxqty=132;
-			$this->posxunit=147;
+			$this->posxqty=150;
+			$this->posxunit=151;
 		} else {
-			$this->posxtva=110;
+			$this->posxtva=250;
 			$this->posxup=126;
-			$this->posxqty=145;
+			$this->posxqty=150;
 		}
 
 		if (! empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT)) $this->posxup = $this->posxtva; // posxtva is picture position reference
@@ -170,6 +170,12 @@ class pdf_muscadet extends ModelePDFSuppliersOrders
 
 		$nblignes = count($object->lines);
 
+		//Simbolo 
+			if ($object->multicurrency_code == 'PEN'){
+				    $signo = 'S/ ';
+				}else{
+					$signo = '$ ';
+				} 
 		// Loop on each lines to detect if there is at least one image to show
 		$realpatharray=array();
 		if (! empty($conf->global->MAIN_GENERATE_SUPPLIER_ORDER_WITH_PICTURE))
@@ -467,9 +473,9 @@ class pdf_muscadet extends ModelePDFSuppliersOrders
 					}
 
 					// Unit price before discount
-					$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
+					$up_excl_tax = $signo.pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
 					$pdf->SetXY($this->posxup, $curY);
-					$pdf->MultiCell($this->posxqty-$this->posxup-0.8, 3, $up_excl_tax, 0, 'R', 0);
+					$pdf->MultiCell($this->posxqty-$this->posxup-0.8, 3, $up_excl_tax, 0, 'C', 0);
 
 					// Quantity
 					$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
@@ -477,11 +483,11 @@ class pdf_muscadet extends ModelePDFSuppliersOrders
 					// Enough for 6 chars
 					if($conf->global->PRODUCT_USE_UNITS)
 					{
-						$pdf->MultiCell($this->posxunit-$this->posxqty-0.8, 4, $qty, 0, 'R');
+						$pdf->MultiCell($this->posxunit-$this->posxqty-0.8, 4, $qty, 0, 'C');
 					}
 					else
 					{
-						$pdf->MultiCell($this->posxdiscount-$this->posxqty-0.8, 4, $qty, 0, 'R');
+						$pdf->MultiCell($this->posxdiscount-$this->posxqty-0.8, 4, $qty, 0, 'C');
 					}
 
 					// Unit
@@ -489,7 +495,7 @@ class pdf_muscadet extends ModelePDFSuppliersOrders
 					{
 						$unit = pdf_getlineunit($object, $i, $outputlangs, $hidedetails, $hookmanager);
 						$pdf->SetXY($this->posxunit, $curY);
-						$pdf->MultiCell($this->posxdiscount-$this->posxunit-0.8, 4, $unit, 0, 'L');
+						$pdf->MultiCell($this->posxdiscount-$this->posxunit-0.8, 4, $unit, 0, 'C');
 					}
 
 					// Discount on line
@@ -497,13 +503,13 @@ class pdf_muscadet extends ModelePDFSuppliersOrders
 					if ($object->lines[$i]->remise_percent)
 					{
 					    $remise_percent = pdf_getlineremisepercent($object, $i, $outputlangs, $hidedetails);
-						$pdf->MultiCell($this->postotalht-$this->posxdiscount-1, 3, $remise_percent, 0, 'R');
+						$pdf->MultiCell($this->postotalht-$this->posxdiscount-1, 3, $remise_percent, 0, 'C');
 					}
 
 					// Total HT line
-                    $total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs);
+                    $total_excl_tax = $signo.pdf_getlinetotalexcltax($object, $i, $outputlangs);
 					$pdf->SetXY($this->postotalht, $curY);
-					$pdf->MultiCell($this->page_largeur-$this->marge_droite-$this->postotalht, 3, $total_excl_tax, 0, 'R', 0);
+					$pdf->MultiCell($this->page_largeur-$this->marge_droite-$this->postotalht, 3, $total_excl_tax, 0, 'C', 0);
 
 					// Collecte des totaux par valeur de tva dans $this->tva["taux"]=total_tva
 					if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) $tvaligne=$object->lines[$i]->multicurrency_total_tva;
