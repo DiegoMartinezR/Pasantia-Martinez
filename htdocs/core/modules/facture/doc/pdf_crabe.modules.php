@@ -150,16 +150,16 @@ class pdf_crabe extends ModelePDFFactures
 		$this->posxdesc=$this->marge_gauche+1;
 		if($conf->global->PRODUCT_USE_UNITS)
 		{
-			$this->posxtva=101;
+			$this->posxtva=250;
 			$this->posxup=118;
-			$this->posxqty=135;
+			$this->posxqty=150;
 			$this->posxunit=151;
 		}
 		else
 		{
-			$this->posxtva=110;
+			$this->posxtva=250;
 			$this->posxup=126;
-			$this->posxqty=145;
+			$this->posxqty=150;
 		}
 		$this->posxdiscount=162;
 		$this->posxprogress=126; // Only displayed for situation invoices
@@ -210,6 +210,13 @@ class pdf_crabe extends ModelePDFFactures
 		$outputlangs->loadLangs(array("main", "bills", "products", "dict", "companies"));
 
 		$nblignes = count($object->lines);
+
+		//simbolo moneda
+		if ($object->multicurrency_code == 'PEN'){
+				    $signo = 'S/ ';
+				}else{
+					$signo = '$ ';
+				} 
 
 		// Loop on each lines to detect if there is at least one image to show
 		$realpatharray=array();
@@ -522,13 +529,13 @@ class pdf_crabe extends ModelePDFFactures
 					{
 						$vat_rate = pdf_getlinevatrate($object, $i, $outputlangs, $hidedetails);
 						$pdf->SetXY($this->posxtva-5, $curY);
-						$pdf->MultiCell($this->posxup-$this->posxtva+4, 3, $vat_rate, 0, 'R');
+						$pdf->MultiCell($this->posxup-$this->posxtva+4, 3, $vat_rate, 0, 'C');
 					}
 
 					// Unit price before discount
-					$up_excl_tax = pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
+					$up_excl_tax = $signo.pdf_getlineupexcltax($object, $i, $outputlangs, $hidedetails);
 					$pdf->SetXY($this->posxup, $curY);
-					$pdf->MultiCell($this->posxqty-$this->posxup-0.8, 3, $up_excl_tax, 0, 'R', 0);
+					$pdf->MultiCell($this->posxqty-$this->posxup-0.8, 3, $up_excl_tax, 0, 'C', 0);
 
 					// Quantity
 					$qty = pdf_getlineqty($object, $i, $outputlangs, $hidedetails);
@@ -537,15 +544,15 @@ class pdf_crabe extends ModelePDFFactures
 
 					if ($this->situationinvoice)
 					{
-						$pdf->MultiCell($this->posxprogress-$this->posxqty-0.8, 4, $qty, 0, 'R');
+						$pdf->MultiCell($this->posxprogress-$this->posxqty-0.8, 4, $qty, 0, 'C');
 					}
 					else if($conf->global->PRODUCT_USE_UNITS)
 					{
-						$pdf->MultiCell($this->posxunit-$this->posxqty-0.8, 4, $qty, 0, 'R');
+						$pdf->MultiCell($this->posxunit-$this->posxqty-0.8, 4, $qty, 0, 'C');
 					}
 					else
 					{
-						$pdf->MultiCell($this->posxdiscount-$this->posxqty-0.8, 4, $qty, 0, 'R');
+						$pdf->MultiCell($this->posxdiscount-$this->posxqty-0.8, 4, $qty, 0, 'C');
 					}
 
 					// Situation progress
@@ -555,15 +562,15 @@ class pdf_crabe extends ModelePDFFactures
 						$pdf->SetXY($this->posxprogress, $curY);
 						if($conf->global->PRODUCT_USE_UNITS)
 						{
-							$pdf->MultiCell($this->posxunit-$this->posxprogress-1, 3, $progress, 0, 'R');
+							$pdf->MultiCell($this->posxunit-$this->posxprogress-1, 3, $progress, 0, 'C');
 						}
 						else if ($this->atleastonediscount)
 						{
-							$pdf->MultiCell($this->posxdiscount-$this->posxprogress-1, 3, $progress, 0, 'R');
+							$pdf->MultiCell($this->posxdiscount-$this->posxprogress-1, 3, $progress, 0, 'C');
 						}
 						else
 						{
-							$pdf->MultiCell($this->postotalht-$this->posxprogress-1, 3, $progress, 0, 'R');
+							$pdf->MultiCell($this->postotalht-$this->posxprogress-1, 3, $progress, 0, 'C');
 						}
 					}
 
@@ -572,7 +579,7 @@ class pdf_crabe extends ModelePDFFactures
 					{
 						$unit = pdf_getlineunit($object, $i, $outputlangs, $hidedetails, $hookmanager);
 						$pdf->SetXY($this->posxunit, $curY);
-						$pdf->MultiCell($this->posxdiscount-$this->posxunit-0.8, 4, $unit, 0, 'L');
+						$pdf->MultiCell($this->posxdiscount-$this->posxunit-0.8, 4, $unit, 0, 'C');
 					}
 
 					// Discount on line
@@ -580,13 +587,13 @@ class pdf_crabe extends ModelePDFFactures
 					{
                         $pdf->SetXY($this->posxdiscount-2, $curY);
 					    $remise_percent = pdf_getlineremisepercent($object, $i, $outputlangs, $hidedetails);
-						$pdf->MultiCell($this->postotalht-$this->posxdiscount+2, 3, $remise_percent, 0, 'R');
+						$pdf->MultiCell($this->postotalht-$this->posxdiscount+2, 3, $remise_percent, 0, 'C');
 					}
 
 					// Total HT line
-					$total_excl_tax = pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
+					$total_excl_tax = $signo.pdf_getlinetotalexcltax($object, $i, $outputlangs, $hidedetails);
 					$pdf->SetXY($this->postotalht, $curY);
-					$pdf->MultiCell($this->page_largeur-$this->marge_droite-$this->postotalht, 3, $total_excl_tax, 0, 'R', 0);
+					$pdf->MultiCell($this->page_largeur-$this->marge_droite-$this->postotalht, 3, $total_excl_tax, 0, 'C', 0);
 
 
 					$sign=1;
